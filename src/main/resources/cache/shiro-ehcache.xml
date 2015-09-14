@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.1.xsd"
+       default-lazy-init="true">
+
+       <!-- 读取配置文件 -->
+   <!--    <context:property-placeholder ignore-unresolvable="true" location="classpath*:/properties/kylin.properties" />
+-->
+
+       <!-- 用户授权信息Cache, 采用EhCache -->
+       <bean id="shiroEhcacheManager"
+              class="org.apache.shiro.cache.ehcache.EhCacheManager">
+              <property name="cacheManager" ref="cacheManager"/>
+              <!--<property name="cacheManagerConfigFile" value="classpath:${shiro.ehcache.confingFile}"/>-->
+       </bean>
+
+       <bean id="sessionDAO"
+              class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+              <property name="activeSessionsCacheName" value="activeSessionsCache" />
+              <property name="sessionIdGenerator" ref="sessionIdGenerator" />
+              <property name="cacheManager" ref="shiroEhcacheManager" />
+       </bean>
+       <!-- 会话ID生成器 可以不必写，shiro默认就是用这个JavaUuidSessionIdGenerator方式实现
+            这里主要体现你可以实现自己的idGen
+       -->
+       <bean id="sessionIdGenerator"
+             class="org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator" />
+
+
+       <bean id="ehcacheCredentialsMatcher" class="com.dou.kylin.security.shiro.ehcache.credentials.RetryLimitHashedCredentialsMatcher">
+              <constructor-arg ref="cacheManager"/>
+              <property name="hashAlgorithmName" value="md5"/>
+              <property name="hashIterations" value="2"/>
+              <property name="storedCredentialsHexEncoded" value="true"/>
+       </bean>
+       <!--
+           <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+               <property name="hashAlgorithmName" value="MD5" />
+               <property name="storedCredentialsHexEncoded" value="true" />
+               <property name="hashIterations" value="2" />
+           </bean>
+       -->
+
+
+</beans>

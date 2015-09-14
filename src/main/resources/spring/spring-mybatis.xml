@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+        <property name="typeAliasesPackage" value="com.dou.kylin" />
+        <!-- 显式指定Mapper文件位置 -->
+        <!--  <property name="mapperLocations" value="classpath*:com/dou/kylin/*/mapper/*.xml" />-->
+        <property name="mapperLocations" value="classpath:mapper/**/*.xml" />
+        <property name="configLocation" value="classpath:/spring/mybatis-config.xml"></property>
+
+        <property name="plugins">
+            <array>
+                <bean class="com.dou.kylin.common.page.PagePlugin">
+                    <property name="properties">
+                        <value>
+                            dialect=mysql
+                            pageSqlId=.*listPage.*
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+
+	</bean>
+
+	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<property name="basePackage" value="com.dou.kylin"/>
+		<property name="annotationClass" value="com.dou.kylin.common.annotation.MyBatisRepository"/>
+	</bean>
+
+
+</beans>
